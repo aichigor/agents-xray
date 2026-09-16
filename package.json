@@ -1,0 +1,17 @@
+{
+  "name": "agents-xray",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Local-first AGENTS.md inspector: loading previews, stale references and reviewable instruction noise.",
+  "license": "MIT",
+  "main": "src/analyzer.js",
+  "bin": { "agents-xray": "bin/agents-xray.js" },
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "test": "node --test test/*.test.js",
+    "check": "node --check src/analyzer.js && node --check src/app.js && node --check bin/agents-xray.js && node --check scripts/build-standalone.js",
+    "demo": "node bin/agents-xray.js examples/demo-project --cwd apps/web",
+    "build:standalone": "node scripts/build-standalone.js"
+  },
+  "keywords": ["agents-md", "codex", "lint", "developer-tools", "local-first"]
+}

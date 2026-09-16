@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Inspect AGENTS.md locally: loading previews, stale references, duplicate rules and reviewable instruction noise.">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>AGENTS X-Ray — AGENTS.md inspector</title>
+  <link rel="stylesheet" href="src/styles.css">
+  <script defer src="src/analyzer.js"></script>
+  <script defer src="src/demo.js"></script>
+  <script defer src="src/app.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#main" aria-label="AGENTS X-Ray"><span class="brand-icon" aria-hidden="true">A<span>×</span></span><span>AGENTS <strong>X-Ray</strong></span><span class="version">v0.1</span></a>
+    <div class="top-actions"><span class="privacy"><span class="dot"></span><span data-i18n="local">本機分析 · 不呼叫 AI</span></span><button id="language" class="button button-small" type="button">English</button></div>
+  </header>
+  <main id="main">
+    <section class="intro">
+      <div class="eyebrow">LESS NOISE. CLEARER RULES.</div>
+      <h1 data-i18n="heading">看清 AI 到底讀了什麼規則。</h1>
+      <p class="lede" data-i18n="lede">檢查 AGENTS.md 的重複提醒、失效引用與載入範圍。先看證據，再決定要不要改。</p>
+      <div class="notice" data-i18n="scope">這是靜態檢查與專案載入預覽，不是 Codex 執行追蹤，也不保證縮短內容就能加速。</div>
+    </section>
+    <div class="workspace">
+      <section class="panel input-panel" aria-labelledby="input-heading">
+        <div class="panel-header"><h2 id="input-heading" data-i18n="inputHeading">01 / 提供規則</h2><span class="tag" id="mode-tag">TEXT</span></div>
+        <div class="input-inner">
+          <div class="input-actions"><button id="demo" class="button button-primary" type="button" data-i18n="demo">試跑範例專案</button><button id="pick-folder" class="button" type="button" data-i18n="folder">選擇專案資料夾</button></div>
+          <input type="file" id="folder-input" webkitdirectory multiple hidden>
+          <p class="micro" data-i18n="folderHelp">資料夾模式只讀取規則檔與 package.json 內容，其餘檔案只用路徑比對。請不要選整顆硬碟。</p>
+          <div class="divider"><span data-i18n="orPaste">或直接貼上 AGENTS.md</span></div>
+          <label class="sr-only" for="editor" data-i18n="editorLabel">AGENTS.md 內容</label>
+          <textarea id="editor" spellcheck="false" placeholder="# Working agreements&#10;- Run `npm run test` before proposing changes.&#10;- Never commit secrets."></textarea>
+          <div class="editor-meta"><span id="source-name">AGENTS.md</span><button id="use-text" class="text-button" type="button" data-i18n="useText">切回貼上模式</button></div>
+          <div class="settings-grid">
+            <label><span data-i18n="cwdLabel">工作目錄（相對於根目錄）</span><input id="cwd" type="text" value="." placeholder="apps/web" autocomplete="off"></label>
+            <label><span data-i18n="budgetLabel">專案容量上限（bytes）</span><input id="budget" type="number" min="0" max="8388608" step="1" value="32768"></label>
+          </div>
+          <label class="fallback-label"><span data-i18n="fallbackLabel">其他規則檔名（選填，逗號分隔）</span><input id="fallback" type="text" placeholder="TEAM_GUIDE.md" autocomplete="off"></label>
+          <p class="micro" data-i18n="fallbackHelp">使用 fallback 檔名時，請先填寫，再選資料夾。不會自動讀取 Codex 的 config.toml。</p>
+          <button id="analyze" class="button button-dark full-width" type="button" data-i18n="analyze">開始檢查 →</button>
+          <p id="status" class="status" role="status" aria-live="polite" data-i18n="initialStatus">先試跑範例，或貼上一份規則。</p>
+        </div>
+      </section>
+      <section class="results" aria-labelledby="results-heading">
+        <div class="results-heading"><h2 id="results-heading" data-i18n="resultsHeading">02 / 檢查結果</h2><div class="export-actions"><button id="export-md" class="button button-small" disabled type="button">↓ Markdown</button><button id="export-json" class="button button-small" disabled type="button">↓ JSON</button></div></div>
+        <div id="empty-state" class="empty-state"><div class="scan-symbol" aria-hidden="true">[ A ]</div><h3 data-i18n="emptyTitle">規則需要的是清楚，不只是更短。</h3><p data-i18n="emptyBody">每個提示都會附檔案、行號與原因。沒有自動刪除，也不會把內容傳給模型。</p></div>
+        <div id="report" hidden>
+          <div class="metrics">
+            <div class="metric"><span data-i18n="loadedMetric">預覽載入量</span><strong id="metric-loaded">0</strong><small id="metric-loaded-sub">bytes</small></div>
+            <div class="metric"><span data-i18n="reviewMetric">待檢視內容</span><strong id="metric-review">0</strong><small data-i18n="reviewSub">bytes · 不等於可刪除量</small></div>
+            <div class="metric"><span data-i18n="findingsMetric">檢查提示</span><strong id="metric-findings">0</strong><small id="metric-findings-sub"></small></div>
+          </div>
+          <section class="panel chain-panel" aria-labelledby="chain-title"><div class="panel-header"><h3 id="chain-title" data-i18n="chainTitle">專案載入預覽</h3><span class="tag">CODEX</span></div><div id="chain-list" class="chain-list"></div></section>
+          <div class="findings-header"><h3 data-i18n="findingsTitle">有證據的檢視清單</h3><label class="filter-label"><span class="sr-only" data-i18n="filterLabel">篩選提示</span><select id="filter"><option value="all" data-i18n="filterAll">全部提示</option><option value="warning" data-i18n="filterWarning">警告與錯誤</option><option value="info" data-i18n="filterInfo">精簡／載入建議</option><option value="loaded" data-i18n="filterLoaded">目前載入檔案</option></select></label></div>
+          <div id="findings" class="findings"></div>
+          <details class="panel details-panel"><summary data-i18n="effectiveTitle">查看模擬合併內容</summary><p class="micro" data-i18n="effectiveHelp">檔名前綴僅為預覽標記，不代表 Codex 的內部提示。內容可能含敏感資訊，匯出前請檢查。</p><pre id="effective-text"></pre></details>
+          <details class="panel details-panel" open><summary data-i18n="limitsTitle">分析範圍、限制與未驗證項目</summary><ul id="limitations"></ul></details>
+        </div>
+      </section>
+    </div>
+    <footer><span>AGENTS X-Ray · MIT · v0.1.0</span><span data-i18n="footer">無追蹤程式 · 無雲端分析 · 不修改原始檔案</span></footer>
+  </main>
+</body>
+</html>
