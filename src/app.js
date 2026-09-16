@@ -24,7 +24,7 @@
     effectiveHelp: ['Filename prefixes are preview markers, not Codex internal prompts. Content may be sensitive; review before exporting.', '檔名前綴僅為預覽標記，不代表 Codex 的內部提示。內容可能含敏感資訊，匯出前請檢查。'],
     limitsTitle: ['Scope, limitations and unverified items', '分析範圍、限制與未驗證項目'], footer: ['No analytics · No cloud analysis · No source edits', '無追蹤程式 · 無雲端分析 · 不修改原始檔案']
   };
-  let lang = 'zh-TW', mode = 'text', snapshot = [], currentReport = null, importNotes = [], projectLabel = '', importedFallback = '', busy = false;
+  let lang = 'en', mode = 'text', snapshot = [], currentReport = null, importNotes = [], projectLabel = '', importedFallback = '', busy = false;
   const say = (en, zh) => lang === 'zh-TW' ? zh : en;
   const fallbackNames = () => $('fallback').value.split(',').map(name => name.trim()).filter(Boolean);
   const fallbackKey = () => JSON.stringify(fallbackNames());
