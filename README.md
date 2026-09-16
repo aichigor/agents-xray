@@ -2,27 +2,43 @@
 
 **See what your coding agent is told — and which instructions deserve a closer look.**
 
+[![Tests](https://github.com/aichigor/agents-xray/actions/workflows/test.yml/badge.svg)](https://github.com/aichigor/agents-xray/actions/workflows/test.yml)
+[![Live Demo](https://img.shields.io/badge/Live_Demo-GitHub_Pages-2ea44f)](https://aichigor.github.io/agents-xray/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
 A local-first inspector for `AGENTS.md`. Find repeated instructions, stale local references, missing package scripts, and files that are shadowed or outside a simulated Codex startup chain.
 
-**Browser UI + Node.js CLI · No runtime dependencies · No AI/API calls · MIT**
+**Browser UI + Node.js CLI · English / 繁體中文 · No runtime dependencies · No AI/API calls · MIT**
 
-[繁體中文](README.zh-TW.md) · [Rule reference](docs/RULES.md) · [Privacy and limits](docs/PRIVACY.md) · [First-time GitHub guide](docs/GITHUB-BEGINNER.zh-TW.md)
+**[Open the live demo →](https://aichigor.github.io/agents-xray/)**
+
+[繁體中文](README.zh-TW.md) · [Rule reference](docs/RULES.md) · [Privacy and limits](docs/PRIVACY.md) · [Validation](docs/VALIDATION.md) · [Contributing](CONTRIBUTING.md)
 
 > **v0.1.0 is an early working release, not a runtime debugger or an AI prompt optimizer.** It reports evidence for human review. It does not delete instructions, measure model tokens, benchmark speed, or promise that shorter instructions perform better. Codex project discovery is a documented approximation; other agents have different loading behavior.
 
 ![AGENTS X-Ray inspecting its synthetic demo project](docs/preview.png)
 
+## Why this exists
+
+AI coding tools make it very easy to keep adding instructions to `AGENTS.md`. Over time, those files can accumulate duplicated reminders, stale paths, dead package commands, and rules that are not loaded for the working directory you actually care about.
+
+AGENTS X-Ray focuses on a narrower question:
+
+> **What is likely to be loaded, what is definitely duplicated or stale, and what deserves human review?**
+
+It intentionally separates deterministic checks from heuristic suggestions, so a warning is not presented as proof that a rule should be deleted.
+
 ## Try it without installing anything
 
-Download the repository ZIP, extract it, and open `index.html` in a current desktop browser. The UI supports English and Traditional Chinese. Click **Try demo project** to inspect an intentionally imperfect example, or paste your own instructions.
+Open the **[live demo](https://aichigor.github.io/agents-xray/)** in a current desktop browser. The interface is English-first and can switch to Traditional Chinese.
 
-For a portable single-file edition, generate `dist/AGENTS-Xray-Standalone.html` with `npm run build:standalone`. No Node.js installation is needed to **use** either browser edition.
+- Click **Try demo project** to inspect an intentionally imperfect fixture.
+- Paste an `AGENTS.md` for text-only review.
+- Use **Choose project folder** for path, package-script and loading-scope checks.
 
-**Paste mode** reviews text only. It cannot verify your filesystem or `package.json`.
+The browser app performs analysis locally. There is no analysis backend, analytics SDK or AI API call in the app. A browser may use the word “Upload” when granting folder access; selected project contents are not uploaded to AGENTS X-Ray servers because there are no such servers.
 
-**Project folder mode** uses the file inventory to check references and loads only supported instruction files and `package.json` contents. Set a repository-relative working directory, such as `apps/web`, to inspect that startup scope. Configure fallback filenames **before** selecting a folder.
-
-Nothing is uploaded to an analysis service. A browser may call the folder-selection confirmation “Upload”; these files are only handed to the local page. Do not confuse this with uploading source code to GitHub.
+You can also download the repository ZIP, extract it and open `index.html`. For a portable single-file edition, generate `dist/AGENTS-Xray-Standalone.html` with `npm run build:standalone`.
 
 ## What it checks
 
@@ -36,7 +52,13 @@ Nothing is uploaded to an analysis service. A browser may call the folder-select
 | Local references | Markdown links and simple backtick-enclosed paths | Missing from the supplied inventory, not necessarily missing everywhere |
 | Package scripts | Simple `npm run`, `pnpm run`, and `yarn run` snippets | Checked against the nearest manifest above the selected cwd; never executed |
 
-Each finding has a stable rule code, file, source line, evidence, severity, confidence category and a suggested next step. JSON and Markdown exports are available. JSON includes the simulated merged instruction text, so **review reports for sensitive content before sharing**.
+Each finding has a stable rule code, file, source line, evidence, severity, confidence category and a suggested next step. JSON and Markdown exports are available. JSON includes simulated merged instruction text, so **review reports for sensitive content before sharing**.
+
+## Browser modes
+
+**Paste mode** reviews text only. It cannot verify your filesystem or `package.json`.
+
+**Project folder mode** uses the file inventory to check references and reads only supported instruction files plus `package.json` content. Other project files contribute paths only. Set a repository-relative working directory such as `apps/web` to inspect that startup scope. Configure fallback filenames **before** selecting a folder.
 
 ## CLI / programmatic use
 
@@ -62,10 +84,11 @@ const report = analyze({
     { path: 'AGENTS.md', content: 'Run `npm run lint` before proposing changes.' },
     { path: 'package.json', content: '{"scripts":{"test":"node --test"}}' }
   ],
-  completeProject: true, // Set only when providing the relevant project inventory.
+  completeProject: true,
   cwd: '.',
   locale: 'en'
 });
+
 console.log(report.findings);
 ```
 
@@ -78,23 +101,17 @@ npm run demo
 npm run build:standalone
 ```
 
-The shared engine is `src/analyzer.js`; `src/app.js` and `bin/agents-xray.js` are browser/filesystem adapters. The browser app uses ordinary scripts rather than ES modules, so it does not require a build server. The standalone builder embeds the same code and generates Content Security Policy hashes.
+The shared engine is `src/analyzer.js`; `src/app.js` and `bin/agents-xray.js` are browser/filesystem adapters. Tests use Node's built-in test runner.
 
-Tests use Node's built-in test runner. GitHub Actions is configured to run the Node tests on Linux/Windows with Node 22/24. A configured workflow is not evidence that it has run on GitHub yet. See [validation notes](docs/VALIDATION.md) for the tests actually exercised before delivery.
+GitHub Actions currently runs the suite on **Ubuntu and Windows with Node 22 and 24**. The published repository has successfully passed all four configured combinations. See [validation notes](docs/VALIDATION.md) for the exact checks and limitations.
 
 ## Important boundaries
 
-The chosen folder is assumed to be the project root. This release does not infer a Git root, read `~/.codex`, interpret `config.toml`/profiles, fetch URLs, follow CLI symlinks, interpret whole shell sessions, or inspect model internals. Only simple loaded command lines are checked, under the selected cwd assumption. Other instruction files can still receive content-review findings, labeled outside the loaded chain.
+The chosen folder is assumed to be the project root. This release does not infer a Git root, read `~/.codex`, interpret `config.toml`/profiles, fetch URLs, follow CLI symlinks, interpret whole shell sessions, or inspect model internals. Only simple loaded command lines are checked under the selected cwd assumption.
 
-Budget accounting uses raw UTF-8 source bytes; runtime wrappers, separators and version-specific boundary behavior are not reproduced. In particular, moving instructions into nested files does not save context if those files are all still loaded. A nested override replaces its **same-directory candidate**, not all parent instructions.
+Budget accounting uses raw UTF-8 source bytes; runtime wrappers, separators and version-specific boundary behavior are not reproduced. Moving instructions into nested files does not save context if those files are still loaded. A nested override replaces its **same-directory candidate**, not all parent instructions.
 
 The tool does not verify that a model follows instructions, detect all semantic contradictions, identify every outdated code symbol, fetch dead web links, or safely rewrite arbitrary instructions. Fewer bytes are not proof of fewer billed tokens, lower latency, or better answers.
-
-## Publish the demo with GitHub Pages
-
-After uploading the source repository, open **Settings → Pages**, choose **Deploy from a branch**, and select **main / (root)**. The included `index.html` is the site entry point and `.nojekyll` marks it as a static site. No backend or API key is needed. The code/demo site is public; a visitor's inspected local files are not added to the repository by this app.
-
-For a first-time walkthrough, use [the Traditional Chinese GitHub guide](docs/GITHUB-BEGINNER.zh-TW.md).
 
 ## Contribute
 
@@ -108,8 +125,6 @@ Discovery behavior was checked against the official documentation on **2026-09-1
 
 - [OpenAI: Custom instructions with AGENTS.md](https://developers.openai.com/codex/guides/agents-md)
 - [npm: npm run](https://docs.npmjs.com/cli/v11/commands/npm-run/)
-- [GitHub: Adding a file to a repository](https://docs.github.com/en/repositories/working-with-files/managing-files/adding-a-file-to-a-repository)
-- [GitHub: Configuring a Pages publishing source](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site)
 
 ## License
 
