@@ -4,6 +4,13 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Inspect AGENTS.md locally: loading previews, stale references, duplicate rules and reviewable instruction noise.">
+  <link rel="canonical" href="https://aichigor.github.io/agents-xray/">
+  <meta property="og:title" content="AGENTS X-Ray — AGENTS.md inspector">
+  <meta property="og:description" content="Local-first checks for duplicate instructions, stale references, package scripts and Codex project loading scope.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://aichigor.github.io/agents-xray/">
+  <meta property="og:image" content="https://aichigor.github.io/agents-xray/docs/preview.png">
+  <meta name="twitter:card" content="summary_large_image">
   <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
   <title>AGENTS X-Ray — AGENTS.md inspector</title>
   <link rel="stylesheet" href="src/styles.css">
@@ -14,7 +21,7 @@
 <body>
   <header class="topbar">
     <a class="brand" href="#main" aria-label="AGENTS X-Ray"><span class="brand-icon" aria-hidden="true">A<span>×</span></span><span>AGENTS <strong>X-Ray</strong></span><span class="version">v0.1</span></a>
-    <div class="top-actions"><span class="privacy"><span class="dot"></span><span data-i18n="local">Local analysis · No AI calls</span></span><button id="language" class="button button-small" type="button">繁體中文</button></div>
+    <div class="top-actions"><span class="privacy"><span class="dot"></span><span data-i18n="local">Local analysis · No AI calls</span></span><a class="button button-small" href="https://github.com/aichigor/agents-xray" target="_blank" rel="noopener noreferrer">GitHub</a><button id="language" class="button button-small" type="button">繁體中文</button></div>
   </header>
   <main id="main">
     <section class="intro">
