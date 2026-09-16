@@ -3,6 +3,14 @@
   "version": "0.1.0",
   "private": true,
   "description": "Local-first AGENTS.md inspector: loading previews, stale references and reviewable instruction noise.",
+  "homepage": "https://aichigor.github.io/agents-xray/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aichigor/agents-xray.git"
+  },
+  "bugs": {
+    "url": "https://github.com/aichigor/agents-xray/issues"
+  },
   "license": "MIT",
   "main": "src/analyzer.js",
   "bin": { "agents-xray": "bin/agents-xray.js" },
